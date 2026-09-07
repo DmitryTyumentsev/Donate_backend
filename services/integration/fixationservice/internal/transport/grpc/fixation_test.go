@@ -7,7 +7,6 @@ import (
 	"Broker_backend/shared/pkg/authz"
 	"Broker_backend/shared/pkg/authz/roles"
 	"context"
-	"errors"
 	"testing"
 	"time"
 
@@ -54,7 +53,7 @@ func (m *mockService) NewFixation(ctx context.Context, req *usecase.FixationRequ
 	return m.newFixation(ctx, req)
 }
 
-func TestNewFixation_ContextWithEmptyPrincipal_CodeInvalidArgument(t *testing.T) {
+func TestNewFixation_ContextWithEmptyPrincipal_CodeUnauthenticated(t *testing.T) {
 	h := NewHandler(fixationv1.UnimplementedFixationServiceServer{}, newMockService(t), zap.NewNop())
 	req := &fixationv1.NewFixationRequest{
 		FixFor:    fixFor,
@@ -63,10 +62,14 @@ func TestNewFixation_ContextWithEmptyPrincipal_CodeInvalidArgument(t *testing.T)
 	}
 	resp, err := h.NewFixation(context.Background(), req)
 	if err != nil {
-		if errors.Is(err, status.Error(codes.Unauthenticated, "unauthenticated")) {
+		if status.Code(err) == codes.Unauthenticated {
 			t.Log("successful, principal not found")
+		} else {
+			t.Fatalf("error is not unauthenticated, err: %v, resp: %s", err, resp)
 		}
-		t.Fatalf("error is not unauthenticated, err: %v, resp: %s", err, resp)
+	}
+	if err == nil || resp != nil {
+		t.Fatalf("other error or success fixation, resp: %v, err: %v", resp, err)
 	}
 }
 

@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"go.uber.org/zap"
 )
 
@@ -228,6 +229,9 @@ func newTestService(t *testing.T) *usecase.Service {
 			HashSecret:       mockHashSecret,
 			FixationDuration: 24 * 30 * time.Hour,
 		},
+	}
+	testPool = &pgxpool.Pool{
+		newConnsCount: goroutines,
 	}
 	tx := postgres.NewTxManager(testPool)
 	repo := postgres.NewRepository(tx)
