@@ -230,3 +230,16 @@ func repoRoot() (string, error) {
 		dir = parent
 	}
 }
+
+func MakeDSN(searchPath string) string {
+	hostPort := "5432/tcp"
+	dsnForRole := func(username, password, searchPath string) string {
+		return fmt.Sprintf(
+			"postgres://%s:%s@localhost:%s/%s?sslmode=disable&search_path=%s",
+			username, password, hostPort, databaseName, searchPath,
+		)
+	}
+	return func(searchPath string) string {
+		return dsnForRole("postgres", "postgres", searchPath)
+	}(searchPath)
+}

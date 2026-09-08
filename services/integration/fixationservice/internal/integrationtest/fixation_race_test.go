@@ -8,13 +8,13 @@ import (
 	"Broker_backend/shared/pkg/authz"
 	"Broker_backend/shared/pkg/authz/roles"
 	"Broker_backend/shared/pkg/clock"
+	"Broker_backend/shared/pkg/dbtest"
 	"context"
 	"errors"
 	"testing"
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"go.uber.org/zap"
 )
 
@@ -26,6 +26,7 @@ const (
 	fixFor           = "22222222-2222-2222-2222-222222222222"
 	deviceID         = "22222222-2222-2222-2222-222222222222"
 	fixationID       = "11111111-1111-1111-1111-111111111111"
+	DSN              = "integration,app,public"
 )
 
 //const (
@@ -230,9 +231,7 @@ func newTestService(t *testing.T) *usecase.Service {
 			FixationDuration: 24 * 30 * time.Hour,
 		},
 	}
-	testPool = &pgxpool.Pool{
-		newConnsCount: goroutines,
-	}
+	testPool = poolWithMaxConns(t, goroutines, dbtest.MakeDSN("integration"))
 	tx := postgres.NewTxManager(testPool)
 	repo := postgres.NewRepository(tx)
 	cl := clock.NewRealClock()

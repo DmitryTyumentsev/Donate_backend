@@ -5,6 +5,7 @@ import (
 	"Broker_backend/services/integration/partnerapi/internal/transport/http/httperr"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -96,7 +97,7 @@ func Idempotency(client *redis.Client, cfg config.IdempotencyConfig, logger *zap
 func replayIdempotencyResponse(ctx context.Context, client *redis.Client, c *fiber.Ctx, key string) error {
 	raw, err := client.Get(ctx, key).Bytes()
 	if err != nil {
-		if err == redis.Nil {
+		if errors.Is(err, redis.Nil) {
 			return httperr.WriteConflict(c, "idempotency request is already processing")
 		}
 

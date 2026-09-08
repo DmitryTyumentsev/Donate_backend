@@ -65,6 +65,21 @@ type mainT struct {
 	testing.TB
 }
 
+func poolWithMaxConns(t *testing.T, n int32, dsn string) *pgxpool.Pool {
+	t.Helper()
+	cfg, err := pgxpool.ParseConfig(dsn)
+	if err != nil {
+		t.Fatalf("parse config: %v", err)
+	}
+	cfg.MaxConns = n
+	p, err := pgxpool.NewWithConfig(context.Background(), cfg)
+	if err != nil {
+		t.Fatalf("new pool: %v", err)
+	}
+	t.Cleanup(p.Close)
+	return p
+}
+
 func (t *mainT) Helper() {}
 
 func (t *mainT) Skip(args ...any) {
