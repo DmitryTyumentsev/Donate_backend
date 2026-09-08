@@ -8,7 +8,6 @@ import (
 	"Broker_backend/shared/pkg/authz"
 	"Broker_backend/shared/pkg/authz/roles"
 	"Broker_backend/shared/pkg/clock"
-	"Broker_backend/shared/pkg/dbtest"
 	"context"
 	"errors"
 	"testing"
@@ -231,7 +230,11 @@ func newTestService(t *testing.T) *usecase.Service {
 			FixationDuration: 24 * 30 * time.Hour,
 		},
 	}
-	testPool = poolWithMaxConns(t, goroutines, dbtest.MakeDSN("integration"))
+	testPool = poolWithMaxConns(
+		t,
+		goroutines,
+		testPool.Config().ConnString(),
+	)
 	tx := postgres.NewTxManager(testPool)
 	repo := postgres.NewRepository(tx)
 	cl := clock.NewRealClock()
