@@ -140,7 +140,7 @@ func TestNewFixation_NoActiveFixation_InsertFixationAuditOutbox(t *testing.T) {
 	}
 	got, err := svc.NewFixation(context.Background(), req)
 	if err != nil {
-		t.Errorf("NewFixation failed, %v", err)
+		t.Fatalf("NewFixation failed, %v", err)
 	}
 	expected := entity.Fixation{
 		AgencyID:  req.AgencyID,

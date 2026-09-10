@@ -423,12 +423,14 @@ grpc-list:
 # на чьей стороне проблема: если здесь работает, а через HTTP нет —
 # дело в partnerapi.
 #
-#   make grpc-fix AGENCY=... PROJECT=... FIX_FOR=... FIX_BY=...
+#   make grpc-fix PROJECT=... FIX_FOR=...
 grpc-fix:
-	grpcurl -plaintext -d '{ \
-	  "agency_id":  "$(or $(AGENCY),11111111-1111-1111-1111-111111111111)", \
+	grpcurl -plaintext  \
+	-h "agency_id: $(or $(AGENCY_ID),11111111-1111-1111-1111-111111111111),  " \
+	-h "user_id: $(or $(USER_ID),11111111-1111-1111-1111-111111111111),  " \
+	-h "role: $(or $(ROLE),admin),  " \
+	-d '{ \
 	  "fix_for":    "$(or $(FIX_FOR),22222222-2222-2222-2222-222222222222)", \
-	  "fix_by":     "$(or $(FIX_BY),22222222-2222-2222-2222-222222222222)", \
 	  "phone":      "$(or $(PHONE),+7 (999) 111-22-33)", \
 	  "project_id": "$(or $(PROJECT),33333333-3333-3333-3333-333333333333)" \
 	}' $(GRPC_ADDR) fixation.v1.FixationService/NewFixation

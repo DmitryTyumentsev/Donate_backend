@@ -3,7 +3,7 @@ CREATE UNIQUE INDEX fixations_phone_hash_project_id_idx ON integration.fixations
 
 DROP INDEX IF EXISTS integration.fixations_phone_hash_agency_id_idx;
 
--- +gooseDown
+-- +goose Down
 DROP INDEX IF EXISTS integration.fixations_phone_hash_project_id_idx;
 
 
